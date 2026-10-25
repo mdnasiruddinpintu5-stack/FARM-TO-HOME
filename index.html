@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -19,9 +18,9 @@ main{max-width:950px;margin:auto;padding:15px}
 input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #ccc;border-radius:8px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .card{background:white;padding:14px;border-radius:12px;box-shadow:0 2px 8px #0001}
-.pic{text-align:center;background:#edf3e7;border-radius:8px;padding:18px;font-size:48px}
-.card h3{font-size:17px}
-.price{color:#205b35;font-weight:bold}
+.pic{width:100%;height:165px;object-fit:cover;border-radius:8px;background:#edf3e7;display:block}
+.price{color:#205b35;font-weight:bold;font-size:18px}
+.old-price{color:#777;text-decoration:line-through;font-size:14px;margin-left:7px;font-weight:normal}
 .add,.send{background:#205b35;color:white;width:100%}
 .panel{background:white;padding:18px;border-radius:12px;margin:18px 0}
 .line{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0}
@@ -42,117 +41,67 @@ footer{background:#205b35;color:white;text-align:center;padding:22px}
 <a href="#products" id="nav1">আমাদের পণ্য</a>
 <a href="#order" id="nav2">অর্ডার করুন</a>
 </nav>
-
 <main>
 <section class="hero">
 <h2 id="welcome">গ্রামের সব খাঁটি পণ্য কিনুন</h2>
 <p id="intro">গ্রাম থেকে সরাসরি আপনার ঘরে।</p>
 </section>
-
 <input id="search" placeholder="পণ্য খুঁজুন..." oninput="showProducts()">
-
-<section id="products">
-<div id="categories"></div>
-<br>
-<div class="grid" id="productList"></div>
-</section>
-
+<section id="products"><div id="categories"></div><br><div class="grid" id="productList"></div></section>
 <section class="panel" id="cart">
 <h2 id="cartTitle">🛒 আপনার বাজারের ব্যাগ</h2>
 <div id="cartList">এখনো পণ্য যোগ করা হয়নি।</div>
-<div class="line">
-<strong id="totalText">মোট মূল্য</strong>
-<strong id="total">৳০</strong>
-</div>
+<div class="line"><strong id="totalText">মোট মূল্য</strong><strong id="total">৳০</strong></div>
 <p id="deliveryNote">ডেলিভারি চার্জ অর্ডার নিশ্চিত করার সময় জানানো হবে।</p>
 <button class="small" onclick="clearCart()" id="clear">কার্ট খালি করুন</button>
 </section>
-
 <section class="panel" id="order">
 <h2 id="orderTitle">📦 অর্ডারের তথ্য</h2>
 <form id="form">
-<label id="lName">আপনার নাম</label>
-<input id="name" required placeholder="আপনার নাম">
-<label id="lPhone">মোবাইল নম্বর</label>
-<input id="phone" type="tel" required placeholder="01XXXXXXXXX">
-<label id="lAddress">সম্পূর্ণ ঠিকানা</label>
-<textarea id="address" required placeholder="গ্রাম, উপজেলা, জেলা"></textarea>
+<label id="lName">আপনার নাম</label><input id="name" required placeholder="আপনার নাম">
+<label id="lPhone">মোবাইল নম্বর</label><input id="phone" type="tel" required placeholder="01XXXXXXXXX">
+<label id="lAddress">সম্পূর্ণ ঠিকানা</label><textarea id="address" required placeholder="গ্রাম, উপজেলা, জেলা"></textarea>
 <label id="lPay">পেমেন্ট</label>
-<select id="pay">
-<option value="Cash on delivery">ক্যাশ অন ডেলিভারি</option>
-<option value="Discuss with seller">বিক্রেতার সঙ্গে আলোচনা</option>
-</select>
-<label id="lNote">অতিরিক্ত নির্দেশনা</label>
-<textarea id="note" placeholder="প্রয়োজনে লিখুন"></textarea>
+<select id="pay"><option value="Cash on delivery">ক্যাশ অন ডেলিভারি</option><option value="Discuss with seller">বিক্রেতার সঙ্গে আলোচনা</option></select>
+<label id="lNote">অতিরিক্ত নির্দেশনা</label><textarea id="note" placeholder="প্রয়োজনে লিখুন"></textarea>
 <button class="send" type="submit" id="send">🟢 WhatsApp-এ অর্ডার পাঠান</button>
 </form>
 <p id="hint">বাটনে চাপ দিলে WhatsApp খুলবে। সেখানে Send চাপলে অর্ডার পাঠানো হবে।</p>
 </section>
 </main>
-
-<footer>
-<h3>🌿 Farm to Home</h3>
-<p>গ্রাম: মদনপুর, মণিরামপুর, যশোর, বাংলাদেশ</p>
-<p>Fresh from Village to Your Home</p>
-</footer>
-
+<footer><h3>🌿 Farm to Home</h3><p>গ্রাম: মদনপুর, মণিরামপুর, যশোর, বাংলাদেশ</p><p>Fresh from Village to Your Home</p></footer>
 <script>
 const WHATSAPP="8801317764600";
 
+/* Google Sheet columns: id, cat, icon, bn, en, unit, price, old_price, image
+   For live sheet integration, publish a CSV/JSON endpoint and set SHEET_CSV_URL below.
+   Images must be direct image URLs in the image column. */
+const SHEET_CSV_URL = "";
+
 const products=[
-{id:1,cat:"eggs",icon:"🥚",bn:"দেশি মুরগির ডিম",en:"Local Chicken Eggs",unit:"টি"},
-{id:2,cat:"eggs",icon:"🪺",bn:"হাঁসের ডিম",en:"Duck Eggs",unit:"টি"},
-{id:3,cat:"honey",icon:"🍯",bn:"খাঁটি মধু",en:"Pure Honey",unit:"কেজি"},
-{id:4,cat:"oil",icon:"🫙",bn:"সরিষার তেল",en:"Mustard Oil",unit:"লিটার"},
-{id:5,cat:"grain",icon:"🌾",bn:"দেশি চাল",en:"Local Rice",unit:"কেজি"},
-{id:6,cat:"grain",icon:"🫘",bn:"ডাল",en:"Lentils",unit:"কেজি"},
-{id:7,cat:"dairy",icon:"🧈",bn:"খাঁটি ঘি",en:"Pure Ghee",unit:"কেজি"},
-{id:8,cat:"dairy",icon:"🥛",bn:"গরুর দুধ",en:"Cow Milk",unit:"লিটার"},
-{id:9,cat:"fruit",icon:"🥭",bn:"মৌসুমি ফল",en:"Seasonal Fruits",unit:"কেজি"},
-{id:10,cat:"fruit",icon:"🥬",bn:"তাজা শাকসবজি",en:"Fresh Vegetables",unit:"কেজি"},
-{id:11,cat:"other",icon:"🥥",bn:"নারকেল",en:"Coconut",unit:"টি"},
-{id:12,cat:"other",icon:"🧺",bn:"অন্যান্য গ্রামের পণ্য",en:"Other Village Products",unit:"পরিমাণ"}
+{id:1,cat:"eggs",icon:"🥚",bn:"দেশি মুরগির ডিম",en:"Local Chicken Eggs",unit:"ডজন",price:190,old_price:210,image:"https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=800&q=80"},
+{id:2,cat:"eggs",icon:"🪺",bn:"হাঁসের ডিম",en:"Duck Eggs",unit:"ডজন",price:230,old_price:250,image:"https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?auto=format&fit=crop&w=800&q=80"},
+{id:3,cat:"honey",icon:"🍯",bn:"খাঁটি মধু",en:"Pure Honey",unit:"কেজি",price:0,old_price:0,image:""},
+{id:4,cat:"oil",icon:"🫙",bn:"সরিষার তেল",en:"Mustard Oil",unit:"লিটার",price:0,old_price:0,image:""},
+{id:5,cat:"grain",icon:"🌾",bn:"দেশি চাল",en:"Local Rice",unit:"কেজি",price:0,old_price:0,image:""},
+{id:6,cat:"grain",icon:"🫘",bn:"ডাল",en:"Lentils",unit:"কেজি",price:0,old_price:0,image:""},
+{id:7,cat:"dairy",icon:"🧈",bn:"খাঁটি ঘি",en:"Pure Ghee",unit:"কেজি",price:0,old_price:0,image:""},
+{id:8,cat:"dairy",icon:"🥛",bn:"গরুর দুধ",en:"Cow Milk",unit:"লিটার",price:0,old_price:0,image:""},
+{id:9,cat:"fruit",icon:"🥭",bn:"মৌসুমি ফল",en:"Seasonal Fruits",unit:"কেজি",price:0,old_price:0,image:""},
+{id:10,cat:"fruit",icon:"🥬",bn:"তাজা শাকসবজি",en:"Fresh Vegetables",unit:"কেজি",price:0,old_price:0,image:""},
+{id:11,cat:"other",icon:"🥥",bn:"নারকেল",en:"Coconut",unit:"টি",price:0,old_price:0,image:""},
+{id:12,cat:"other",icon:"🧺",bn:"অন্যান্য গ্রামের পণ্য",en:"Other Village Products",unit:"পরিমাণ",price:0,old_price:0,image:""}
 ];
 
 const labels={
-bn:{
-tag:"গ্রামের খাঁটি পণ্য, সরাসরি আপনার ঘরে",nav1:"আমাদের পণ্য",nav2:"অর্ডার করুন",
-welcome:"গ্রামের সব খাঁটি পণ্য কিনুন",intro:"গ্রাম থেকে সরাসরি আপনার ঘরে।",
-search:"পণ্য খুঁজুন...",cartTitle:"🛒 আপনার বাজারের ব্যাগ",
-empty:"এখনো পণ্য যোগ করা হয়নি।",totalText:"মোট পণ্য মূল্য",
-deliveryNote:"ডেলিভারি চার্জ অর্ডার নিশ্চিত করার সময় জানানো হবে।",
-clear:"কার্ট খালি করুন",orderTitle:"📦 অর্ডারের তথ্য",lName:"আপনার নাম",
-lPhone:"মোবাইল নম্বর",lAddress:"সম্পূর্ণ ঠিকানা",lPay:"পেমেন্ট",
-lNote:"অতিরিক্ত নির্দেশনা",send:"🟢 WhatsApp-এ অর্ডার পাঠান",
-hint:"বাটনে চাপ দিলে WhatsApp খুলবে। সেখানে Send চাপলে অর্ডার পাঠানো হবে।",
-add:"কার্টে যোগ করুন",remove:"বাদ দিন",cats:["সব পণ্য","ডিম","মধু","তেল","চাল ও ডাল","দুধ ও ঘি","ফল ও সবজি","অন্যান্য"],
-notSet:"দাম জানতে WhatsApp করুন",pay:"পেমেন্ট পদ্ধতি"
-},
-en:{
-tag:"Authentic Village Products, Delivered to Your Home",nav1:"Our Products",nav2:"Order",
-welcome:"Shop Authentic Village Products",intro:"Fresh products from village to your home.",
-search:"Search products...",cartTitle:"🛒 Your Shopping Cart",
-empty:"Your cart is empty.",totalText:"Product subtotal",
-deliveryNote:"Delivery charges will be confirmed with your order.",
-clear:"Clear cart",orderTitle:"📦 Order Details",lName:"Your Name",
-lPhone:"Mobile Number",lAddress:"Full Address",lPay:"Payment",
-lNote:"Additional Instructions",send:"🟢 Order via WhatsApp",
-hint:"WhatsApp will open. Press Send there to submit your order.",
-add:"Add to Cart",remove:"Remove",cats:["All Products","Eggs","Honey","Oil","Rice & Lentils","Milk & Ghee","Fruit & Vegetables","Other"],
-notSet:"Ask for price on WhatsApp",pay:"Payment method"
-}
+bn:{tag:"গ্রামের খাঁটি পণ্য, সরাসরি আপনার ঘরে",nav1:"আমাদের পণ্য",nav2:"অর্ডার করুন",welcome:"গ্রামের সব খাঁটি পণ্য কিনুন",intro:"গ্রাম থেকে সরাসরি আপনার ঘরে।",search:"পণ্য খুঁজুন...",cartTitle:"🛒 আপনার বাজারের ব্যাগ",empty:"এখনো পণ্য যোগ করা হয়নি।",totalText:"মোট পণ্য মূল্য",deliveryNote:"ডেলিভারি চার্জ অর্ডার নিশ্চিত করার সময় জানানো হবে।",clear:"কার্ট খালি করুন",orderTitle:"📦 অর্ডারের তথ্য",lName:"আপনার নাম",lPhone:"মোবাইল নম্বর",lAddress:"সম্পূর্ণ ঠিকানা",lPay:"পেমেন্ট",lNote:"অতিরিক্ত নির্দেশনা",send:"🟢 WhatsApp-এ অর্ডার পাঠান",hint:"বাটনে চাপ দিলে WhatsApp খুলবে। সেখানে Send চাপলে অর্ডার পাঠানো হবে।",add:"কার্টে যোগ করুন",remove:"বাদ দিন",notSet:"দাম জানতে WhatsApp করুন",cats:["সব পণ্য","ডিম","মধু","তেল","চাল ও ডাল","দুধ ও ঘি","ফল ও সবজি","অন্যান্য"]},
+en:{tag:"Authentic Village Products, Delivered to Your Home",nav1:"Our Products",nav2:"Order",welcome:"Shop Authentic Village Products",intro:"Fresh products from village to your home.",search:"Search products...",cartTitle:"🛒 Your Shopping Cart",empty:"Your cart is empty.",totalText:"Product subtotal",deliveryNote:"Delivery charges will be confirmed with your order.",clear:"Clear cart",orderTitle:"📦 Order Details",lName:"Your Name",lPhone:"Mobile Number",lAddress:"Full Address",lPay:"Payment",lNote:"Additional Instructions",send:"🟢 Order via WhatsApp",hint:"WhatsApp will open. Press Send there to submit your order.",add:"Add to Cart",remove:"Remove",notSet:"Ask for price on WhatsApp",cats:["All Products","Eggs","Honey","Oil","Rice & Lentils","Milk & Ghee","Fruit & Vegetables","Other"]}
 };
-
 let lang="bn",filter="all",cart={};
 const catKeys=["all","eggs","honey","oil","grain","dairy","fruit","other"];
-
 function language(l){
-lang=l;
-document.documentElement.lang=l;
-const w=labels[l];
-["tag","nav1","nav2","welcome","intro","cartTitle","totalText","deliveryNote","clear","orderTitle","lName","lPhone","lAddress","lPay","lNote","send","hint"].forEach(id=>{
-document.getElementById(id).textContent=w[id];
-});
+lang=l;document.documentElement.lang=l;const w=labels[l];
+["tag","nav1","nav2","welcome","intro","cartTitle","totalText","deliveryNote","clear","orderTitle","lName","lPhone","lAddress","lPay","lNote","send","hint"].forEach(id=>{document.getElementById(id).textContent=w[id];});
 document.getElementById("search").placeholder=w.search;
 document.getElementById("name").placeholder=l==="bn"?"আপনার নাম":"Your name";
 document.getElementById("phone").placeholder=l==="bn"?"01XXXXXXXXX":"Phone number";
@@ -162,68 +111,42 @@ document.querySelector("#pay option[value='Cash on delivery']").textContent=l===
 document.querySelector("#pay option[value='Discuss with seller']").textContent=l==="bn"?"বিক্রেতার সঙ্গে আলোচনা":"Discuss with seller";
 showCategories();showProducts();
 }
-
 function showCategories(){
-document.getElementById("categories").innerHTML=labels[lang].cats.map((c,i)=>
-`<button class="small" style="margin:3px;background:${filter===catKeys[i]?'#205b35':'#e5eddf'};color:${filter===catKeys[i]?'white':'#205b35'}" onclick="setFilter('${catKeys[i]}')">${c}</button>`
-).join("");
+document.getElementById("categories").innerHTML=labels[lang].cats.map((c,i)=>`<button class="small" style="margin:3px;background:${filter===catKeys[i]?'#205b35':'#e5eddf'};color:${filter===catKeys[i]?'white':'#205b35'}" onclick="setFilter('${catKeys[i]}')">${c}</button>`).join("");
 }
 function setFilter(c){filter=c;showCategories();showProducts();}
-
 function showProducts(){
 const q=document.getElementById("search").value.toLowerCase().trim();
-const list=products.filter(p=>(filter==="all"||p.cat===filter)&&
-(p.bn.toLowerCase().includes(q)||p.en.toLowerCase().includes(q)));
-document.getElementById("productList").innerHTML=list.map(p=>`
-<div class="card">
-<div class="pic">${p.icon}</div>
-<h3>${lang==="bn"?p.bn:p.en}</h3>
-<p class="price">${labels[lang].notSet}</p>
-<button class="add" onclick="add(${p.id})">${labels[lang].add}</button>
-</div>`).join("")||"পণ্য পাওয়া যায়নি";
+const list=products.filter(p=>(filter==="all"||p.cat===filter)&&(p.bn.toLowerCase().includes(q)||p.en.toLowerCase().includes(q)));
+document.getElementById("productList").innerHTML=list.map(p=>{
+const title=lang==="bn"?p.bn:p.en;
+const priceHtml=p.price>0?`<p class="price">৳${p.price} <span class="old-price">৳${p.old_price}</span> / ${p.unit}</p>`:`<p class="price">${labels[lang].notSet}</p>`;
+const imageHtml=p.image?`<img class="pic" src="${p.image}" alt="${title}" loading="lazy" onerror="this.outerHTML='<div class=&quot;pic&quot;>${p.icon}</div>'">`:`<div class="pic">${p.icon}</div>`;
+return `<div class="card">${imageHtml}<h3>${title}</h3>${priceHtml}<button class="add" onclick="add(${p.id})">${labels[lang].add}</button></div>`;
+}).join("")||"পণ্য পাওয়া যায়নি";
 renderCart();
 }
-
 function add(id){cart[id]=(cart[id]||0)+1;renderCart();document.getElementById("cart").scrollIntoView({behavior:"smooth"});}
 function change(id,n){cart[id]+=n;if(cart[id]<=0)delete cart[id];renderCart();}
 function remove(id){delete cart[id];renderCart();}
 function clearCart(){cart={};renderCart();}
-
 function renderCart(){
 const w=labels[lang],items=Object.entries(cart);
-document.getElementById("cartList").innerHTML=items.length?items.map(([id,n])=>{
-const p=products.find(x=>x.id==id);
-return `<div class="line"><span>${lang==="bn"?p.bn:p.en} (${n} ${p.unit})</span>
-<span><button class="small" onclick="change(${id},-1)">−</button>
-<button class="small" onclick="change(${id},1)">+</button>
-<button class="small" onclick="remove(${id})">${w.remove}</button></span></div>`;
-}).join(""):w.empty;
-document.getElementById("total").textContent="দাম নিশ্চিত করা হবে";
+document.getElementById("cartList").innerHTML=items.length?items.map(([id,n])=>{const p=products.find(x=>x.id==id);return `<div class="line"><span>${lang==="bn"?p.bn:p.en} (${n} ${p.unit})</span><span><button class="small" onclick="change(${id},-1)">−</button> <button class="small" onclick="change(${id},1)">+</button> <button class="small" onclick="remove(${id})">${w.remove}</button></span></div>`;}).join(""):w.empty;
+const total=items.reduce((sum,[id,n])=>{const p=products.find(x=>x.id==id);return sum+(p.price>0?p.price*n:0);},0);
+document.getElementById("total").textContent=items.length&&items.every(([id])=>products.find(x=>x.id==id).price>0)?"৳"+total.toLocaleString("en-BD"):"দাম নিশ্চিত করা হবে";
 }
-
 document.getElementById("form").addEventListener("submit",function(e){
 e.preventDefault();
-if(!Object.keys(cart).length){
-alert(lang==="bn"?"আগে কার্টে পণ্য যোগ করুন":"Please add products to your cart first");return;
-}
-const w=labels[lang];
-const name=document.getElementById("name").value.trim();
-const phone=document.getElementById("phone").value.trim();
-const address=document.getElementById("address").value.trim();
+if(!Object.keys(cart).length){alert(lang==="bn"?"আগে কার্টে পণ্য যোগ করুন":"Please add products to your cart first");return;}
+const name=document.getElementById("name").value.trim(),phone=document.getElementById("phone").value.trim(),address=document.getElementById("address").value.trim();
 if(!name||!phone||!address)return;
-
-const items=Object.entries(cart).map(([id,n])=>{
-const p=products.find(x=>x.id==id);
-return `- ${lang==="bn"?p.bn:p.en}: ${n} ${p.unit}`;
-}).join("\n");
-
-const message=`Farm to Home - Order\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nProducts:\n${items}\n\nPayment: ${document.getElementById("pay").value}\nInstructions: ${document.getElementById("note").value}\n\nPlease confirm prices and delivery charges.`;
-
+const items=Object.entries(cart).map(([id,n])=>{const p=products.find(x=>x.id==id);return `- ${lang==="bn"?p.bn:p.en}: ${n} ${p.unit}${p.price>0?" (৳"+(p.price*n)+")":" (price to confirm)"}`;}).join("\n");
+const total=Object.entries(cart).reduce((s,[id,n])=>{const p=products.find(x=>x.id==id);return s+(p.price>0?p.price*n:0);},0);
+const message=`Farm to Home - Order\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nProducts:\n${items}\n${Object.keys(cart).every(id=>products.find(p=>p.id==id).price>0)?"\nProduct subtotal: ৳"+total:"\nSome prices need confirmation"}\n\nPayment: ${document.getElementById("pay").value}\nInstructions: ${document.getElementById("note").value}\n\nPlease confirm delivery charges.`;
 window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(message),"_blank");
 });
-
-showCategories();
-showProducts();
+showCategories();showProducts();
 </script>
 </body>
 </html>
